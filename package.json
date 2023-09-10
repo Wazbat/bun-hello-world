@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "bun build --target=bun ./src/index.ts --outfile=dist/server.js",
     "dev": "bun run --watch src/index.ts"
   },
   "devDependencies": {
