@@ -1,18 +1,14 @@
-name: Deploy
+name: Build
 on:
-  push:
-    branches:    
-      - 'main'
-      - 'hotfix/*'
+  pull_request:
+  push:  
+    branches:
+      - main
+      - hotfix/*
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-    outputs:
-      digest: ${{ steps.build-push.outputs.digest }}
     steps:
     - uses: actions/checkout@v3
     - name: Login to GitHub Container Registry
@@ -29,12 +25,12 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: ghcr.io/wazbat/bun-hello-world
+        images: ghcr.io/${{ github.repository }}
     - name: Build and push
       id: build-push
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
-        push: true
+        push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
@@ -42,3 +38,4 @@ jobs:
         build-args: |
             BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+            REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
