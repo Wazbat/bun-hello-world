@@ -1,9 +1,11 @@
 import { Elysia } from 'elysia';
 
+if (!process.env.PORT) throw new Error('PORT is not defined');
+
 const app = new Elysia()
 	.get('/', () => 'Hello Elysia')
     .get('/ping', () => 'pong')
-	.listen(8080);
+	.listen(process.env.PORT);
 
 
 console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
